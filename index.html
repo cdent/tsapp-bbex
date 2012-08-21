@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>App Stub</title>
+        <link
+            rel="stylesheet"
+            type="text/css"
+            href="/bags/common/tiddlers/normalize.css" />
+        <link
+            rel="stylesheet"
+            type="text/css"
+            href="/bags/bbex_public/tiddlers/bbex.css" />
+    </head>
+    <body>
+        <h1>Stub</h1>
+
+        <h2>Some Tiddlers</h2>
+        <ul id="tiddlers">
+        </ul>
+
+<script id="tiddler-display-template" type="text/template">
+<h1><%= title %></h1>
+<p><%= text %></p>
+<ul>
+<% _.each(tags, function(tag) { %> <li><%= tag %></li> <%}); %>
+</ul>
+</script>
+        <script src="/bags/common/tiddlers/jquery.js"></script>
+        <script src="/bags/bbex_public/tiddlers/underscore.js"></script>
+        <script src="/bags/bbex_public/tiddlers/backbone.js"></script>
+
+        <script src="/bags/bbex_public/tiddlers/bbex.js"></script>
+
+    </body>
+</html>
