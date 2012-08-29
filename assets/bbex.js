@@ -36,9 +36,19 @@ var TiddlerView = Backbone.View.extend({
 
 	render: function() {
 		var tiddler = this.model,
-			text = tiddler.get('render') ||
-				'<pre>' + tiddler.get('text') + '</pre>',
-			nest = $('<div>').html(text).attr('class', 'tiddler-body');
+			type = tiddler.get('type'),
+			render = tiddler.get('render'),
+			text = tiddler.get('text'),
+			nest;
+
+		if (type.match(/^image/)) {
+			text = '<img src="data:' + type + ';base64,' + text + '">';
+		} else if (render) {
+			text = render;
+		} else {
+			text = '<pre>' + text + '</pre>';
+		}
+		nest = $('<div>').html(text).attr('class', 'tiddler-body');
 		this.$el.append(nest);
 		return this;
 	}
