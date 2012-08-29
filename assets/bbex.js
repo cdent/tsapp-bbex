@@ -47,6 +47,7 @@ var TiddlerListDisplay = Backbone.View.extend({
 		this._tiddlerViews = [];
 		// add the existing members 
 		this.collection.each(this.add);
+
 		this.collection.bind('add', this.add);
 		this.collection.bind('remove', this.remove);
 	},
@@ -60,7 +61,6 @@ var TiddlerListDisplay = Backbone.View.extend({
 		this._tiddlerViews.push(view);
 
 		if (this._rendered) {
-			console.log(view.render().el);
 			$(this.el).append(view.render().el);
 		}
 	},
@@ -75,6 +75,7 @@ var TiddlerListDisplay = Backbone.View.extend({
 	},
 
 	render: function() {
+		console.log('calling render');
 		this._rendered = true;
 		$(this.el).empty();
 
@@ -91,6 +92,7 @@ var view = new TiddlerListDisplay({
 	collection: tiddlers,
 	el: $('ul#tiddlers')[0]
 });
-view.render();
-tiddlers.url = '/bags/cdent-t10_public/tiddlers?fat=1;render=1';
+//view.render();
+tiddlers.url = '/bags/bbex_public/tiddlers?fat=1;render=1';
+console.log('calling fetch');
 tiddlers.fetch({add: true});
