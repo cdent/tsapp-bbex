@@ -62,6 +62,7 @@ var TiddlerList = Backbone.View.extend({
 
 	initialize: function() {
 		_.bindAll(this, 'render');
+		this.collection.bind('reset', this.render);
 	},
 
 	render: function() {
@@ -81,4 +82,5 @@ var TiddlerList = Backbone.View.extend({
 
 var tiddlers = new Tiddlers();
 var tiddlerList = new TiddlerList({collection: tiddlers, el: $('#tiddlers')[0]});
-tiddlers.fetch({success: tiddlerList.render});
+//tiddlers.fetch({success: tiddlerList.render});
+tiddlers.fetch();
