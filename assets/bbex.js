@@ -41,7 +41,7 @@ var TiddlerView = Backbone.View.extend({
 			text = tiddler.get('text'),
 			nest;
 
-		if (type.match(/^image/)) {
+		if (type && type.match(/^image/)) {
 			text = '<img src="data:' + type + ';base64,' + text + '">';
 		} else if (render) {
 			text = render;
