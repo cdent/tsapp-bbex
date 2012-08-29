@@ -1,0 +1,12 @@
+
+.tiddler-title,
+.tiddler-body {
+	cursor: pointer; 
+}
+
+body,
+.tiddler-body {
+	padding: 1em;
+	margin: 1em;
+	border: thin solid black;
+}

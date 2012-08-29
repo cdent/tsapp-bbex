@@ -1,4 +1,6 @@
 
+var urlRoot = '/bags/bbex_public/tiddlers';
+
 var Tiddler = Backbone.Model.extend({
 	defaults: {
 		title: '',
@@ -6,93 +8,77 @@ var Tiddler = Backbone.Model.extend({
 		text: '',
 		fields: {}
 	},
+	idAttribute: 'title',
+	urlRoot: urlRoot,
 });
 
 var Tiddlers = Backbone.Collection.extend({
-	model: Tiddler
+	model: Tiddler,
+	url: urlRoot + '?fat=1;render=1',
 });
 
-var TiddlerDisplay = Backbone.View.extend({
+
+var TiddlerView = Backbone.View.extend({
+
 	events: {
-		'click h1': 'hide'
+		'click .tiddler-body': 'toList',
 	},
-	className: 'tiddler',
+
+	toList: function(args) {
+		var title = this.model.get('title');
+		$(args.currentTarget).remove();
+		return false;
+	},
+
 	initialize: function() {
 		_.bindAll(this, 'render');
-		this.model.on('change', this.render);
-		this.model.on('destroy', this.remove);
-	},
-	render: function( event ) {
-		var templateString = $('#tiddler-display-template').html(),
-			template = _.template(templateString);
-			data = this.model.toJSON();
-		console.log(data);
-		if (data.render && data.render.match(/<div>/)) {
-			data.text = data.render;
-		}
-		this.$el.html(template(data));
-		return this;
-	},
-	remove: function() {
-		this.$el.remove();
-	},
-	hide: function() {
-		this.remove();
-	}
-});
-
-var TiddlerListDisplay = Backbone.View.extend({
-	initialize: function() {
-		_(this).bindAll('add', 'remove');
-		this._tiddlerViews = [];
-		// add the existing members 
-		this.collection.each(this.add);
-
-		this.collection.bind('add', this.add);
-		this.collection.bind('remove', this.remove);
-	},
-
-	add: function(tiddler) {
-		var view = new TiddlerDisplay({
-			tagName: 'li',
-			model: tiddler
-		});
-
-		this._tiddlerViews.push(view);
-
-		if (this._rendered) {
-			$(this.el).append(view.render().el);
-		}
-	},
-
-	remove: function(model) {
-		var viewToRemove = _(this._tiddlerViews).select(function(cv) {
-			return cv.model === model;
-		})[0];
-		this._tiddlerViews = _(this._tiddlerViews).without(viewToRemove);
-
-		if (this._rendered) $(viewToRemove.el).remove();
 	},
 
 	render: function() {
-		console.log('calling render');
-		this._rendered = true;
-		$(this.el).empty();
+		var tiddler = this.model,
+			text = tiddler.get('render') ||
+				'<pre>' + tiddler.get('text') + '</pre>',
+			nest = $('<div>').html(text).attr('class', 'tiddler-body');
+		this.$el.append(nest);
+		return this;
+	}
+});
 
-		_(this._tiddlerViews).each(function(view) {
-			$('ul#tiddlers').append(view.render().el);
+var TiddlerList = Backbone.View.extend({
+
+	events: {
+		'click li.tiddler-title': 'show',
+	},
+
+	show: function(args) {
+		var target = args.currentTarget,
+			title = $(target).text(),
+			model = this.collection.get(title);
+		if ($(target).children('div').length === 0) {
+			new TiddlerView({model: model, el: target}).render();
+		}
+		return false;
+	},
+
+	initialize: function() {
+		_.bindAll(this, 'render');
+	},
+
+	render: function() {
+		var that = this,
+			titles = this.collection.map(
+			function(tiddler) {
+				return tiddler.get('title');
+			}
+		);
+		_.each(titles, function(title) {
+			var liEl = $('<li>').attr('class', 'tiddler-title').text(title);
+			that.$el.append(liEl);
 		});
-
 		return this;
 	}
 });
 
 var tiddlers = new Tiddlers();
-var view = new TiddlerListDisplay({
-	collection: tiddlers,
-	el: $('ul#tiddlers')[0]
-});
-//view.render();
-tiddlers.url = '/bags/bbex_public/tiddlers?fat=1;render=1';
-console.log('calling fetch');
-tiddlers.fetch({add: true});
+var tiddlerList = new TiddlerList({collection: tiddlers, el: $('#tiddlers')[0]});
+tiddlers.fetch({success: tiddlerList.render});
