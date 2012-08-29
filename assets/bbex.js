@@ -1,5 +1,5 @@
 
-var urlRoot = '/bags/bbex_public/tiddlers';
+var urlRoot = '/bags/' + tiddlyweb.status.space.name + '_public/tiddlers';
 
 var Tiddler = Backbone.Model.extend({
 	defaults: {
@@ -14,7 +14,7 @@ var Tiddler = Backbone.Model.extend({
 
 var Tiddlers = Backbone.Collection.extend({
 	model: Tiddler,
-	url: urlRoot + '?fat=1;render=1',
+	url: urlRoot + '?fat=1;render=1;sort=-modified',
 });
 
 
@@ -85,6 +85,7 @@ var TiddlerList = Backbone.View.extend({
 				return tiddler.get('title');
 			}
 		);
+		that.$el.empty();
 		_.each(titles, function(title) {
 			var liEl = $('<li>').attr('class', 'tiddler-title').text(title);
 			that.$el.append(liEl);

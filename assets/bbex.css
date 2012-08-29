@@ -10,3 +10,7 @@ body,
 	margin: 1em;
 	border: thin solid black;
 }
+
+.info {
+    font-size: 80%;
+}
