@@ -68,6 +68,7 @@ var TiddlerList = Backbone.View.extend({
 			title = $(target).text(),
 			model = this.collection.get(title);
 		if ($(target).children('div').length === 0) {
+			$(target).addClass('visited');
 			new TiddlerView({model: model, el: target}).render();
 		}
 		return false;
@@ -87,7 +88,7 @@ var TiddlerList = Backbone.View.extend({
 		);
 		that.$el.empty();
 		_.each(titles, function(title) {
-			var liEl = $('<li>').attr('class', 'tiddler-title').text(title);
+			var liEl = $('<li>').addClass('tiddler-title').text(title);
 			that.$el.append(liEl);
 		});
 		return this;
@@ -96,5 +97,4 @@ var TiddlerList = Backbone.View.extend({
 
 var tiddlers = new Tiddlers();
 var tiddlerList = new TiddlerList({collection: tiddlers, el: $('#tiddlers')[0]});
-//tiddlers.fetch({success: tiddlerList.render});
 tiddlers.fetch();
