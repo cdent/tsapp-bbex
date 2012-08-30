@@ -8,8 +8,7 @@
 
 	"use strict";
 
-	var //root = this, // not yet used
-		urlRoot = '/bags/' + tiddlyweb.status.space.name + '_public/tiddlers',
+	var root = this,
 		Tiddler,
 		Tiddlers,
 		TiddlerView,
@@ -42,10 +41,8 @@
 	 * All the tiddlers in one bag, which we can fetch.
 	 */
 	Tiddlers = Backbone.Collection.extend({
-		model: Tiddler,
-		url: urlRoot + (urlRoot.match(/\?/) ? ';' : '?') + 'sort=-modified'
+		model: Tiddler
 	});
-
 
 	/*
 	 * View on a single tiddler.
@@ -161,15 +158,66 @@
 		}
 	});
 
+
+	/*
+	 * Construct a sort comparator for any field.
+	 * If options.toInt the field is turned into
+	 * a number. If options.reverse, sort in 
+	 * reverse.
+	 */
+	function makeSort(field, options) {
+		options = options || {};
+
+
+		// helpers
+		function reverse(arg) {
+			return -arg;
+		}
+		function compose(invoking, argF) {
+			return function() {
+				return invoking.call(this, argF.apply(this, arguments));
+			};
+		}
+
+		var sorter = function(modelA, modelB) {
+			var valueA = modelA.get(field),
+				valueB = modelB.get(field);
+			if (isNaN(valueA)) {
+				valueA = valueA.toLowerCase();
+				valueB = valueB.toLowerCase();
+			}
+			if (options.toInt) {
+				valueA = parseInt(valueA, 10);
+				valueB = parseInt(valueB, 10);
+			}
+			if (valueA > valueB) {
+				return 1;
+			}
+			if (valueB > valueA) {
+				return -1;
+			}
+			return 0;
+		};
+		if (options.reverse) {
+			sorter = compose(reverse, sorter);
+		}
+		return sorter;
+	}
+
 	/*
 	 * Do the actual work to get started. That is:
 	 * make a Tiddlers, add it is a view, using a particular
 	 * element to contain it, and fetch the tiddlers.
 	 */
-	var view = new TiddlerListView({
-		collection: new Tiddlers(),
+	var tiddlers = new Tiddlers();
+	new TiddlerListView({
+		collection: tiddlers,
 		el: $('#tiddlers')[0]
 	});
-	view.collection.fetch();
-
+	tiddlers.url = '/bags/'
+		+ tiddlyweb.status.space.name
+		+ '_public/tiddlers';
+	tiddlers.comparator = makeSort('modified', {toInt: true, reverse: true});
+	tiddlers.fetch();
+	root.tiddlers = tiddlers;
 }).call(this);
