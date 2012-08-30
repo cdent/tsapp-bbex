@@ -26,7 +26,6 @@
 			fields: {}
 		},
 		idAttribute: 'title',
-		urlRoot: urlRoot,
 
 		/*
 		 * Construct the url for this tiddler, appending
@@ -34,7 +33,7 @@
 		 * to force the underlying ajax calls to behave.
 		 */
 		url: function() {
-			return Backbone.Model.prototype.url.call(this) + ".json?render=1";
+			return this.get('uri') + ".json?render=1";
 		}
 
 	});
@@ -44,7 +43,7 @@
 	 */
 	Tiddlers = Backbone.Collection.extend({
 		model: Tiddler,
-		url: urlRoot + '?sort=-modified'
+		url: urlRoot + (urlRoot.match(/\?/) ? ';' : '?') + 'sort=-modified'
 	});
 
 
