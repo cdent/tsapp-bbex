@@ -23,11 +23,20 @@
 		defaults: {
 			title: '',
 			tags: [],
-			text: '',
 			fields: {}
 		},
 		idAttribute: 'title',
-		urlRoot: urlRoot
+		urlRoot: urlRoot,
+
+		/*
+		 * Construct the url for this tiddler, appending
+		 * render=1 so we get the rendered text and .json
+		 * to force the underlying ajax calls to behave.
+		 */
+		url: function() {
+			return Backbone.Model.prototype.url.call(this) + ".json?render=1";
+		}
+
 	});
 
 	/*
@@ -35,7 +44,7 @@
 	 */
 	Tiddlers = Backbone.Collection.extend({
 		model: Tiddler,
-		url: urlRoot + '?fat=1;render=1;sort=-modified'
+		url: urlRoot + '?sort=-modified'
 	});
 
 
@@ -46,6 +55,7 @@
 
 		initialize: function() {
 			_.bindAll(this, 'render');
+			this.model.bind('change', this.render);
 		},
 
 		/*
@@ -127,7 +137,12 @@
 				model = this.collection.get(title);
 			if ($(target).children('div').length === 0) {
 				$(target).addClass('visited');
-				new TiddlerView({model: model, el: target}).render();
+				var view = new TiddlerView({model: model, el: target});
+				if (!model.has('text')) {
+					model.fetch();
+				} else {
+					view.render();
+				}
 			}
 			return false;
 		},
