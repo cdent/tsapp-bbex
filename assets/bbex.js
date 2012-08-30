@@ -27,7 +27,7 @@ var TiddlerView = Backbone.View.extend({
 	toList: function(args) {
 		var title = this.model.get('title');
 		$(args.currentTarget).remove();
-		return false;
+		//return false;
 	},
 
 	initialize: function() {
