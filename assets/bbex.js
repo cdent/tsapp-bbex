@@ -84,7 +84,7 @@
 			var tiddler = this.model,
 				type = tiddler.get('type'),
 				render = tiddler.get('render'),
-				text = tiddler.get('text'),
+				text = tiddler.escape('text'),
 				nest;
 
 			if (render) {
@@ -94,10 +94,6 @@
 					+ type
 					+ ';base64,'
 					+ text + '">';
-			} else if (type && type.match(/^text\/html/)) {
-				text = '<pre>'
-					+ text.replace(/</g, '&lt;').replace(/>/g, '&gt;')
-					+ '</pre>';
 			} else {
 				text = '<pre>' + text + '</pre>';
 			}
