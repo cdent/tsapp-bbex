@@ -144,11 +144,7 @@
 		 */
 		render: function() {
 			var that = this,
-				titles = this.collection.map(
-					function(tiddler) {
-						return tiddler.get('title');
-					}
-				);
+				titles = this.collection.pluck('title');
 			that.$el.empty();
 			_.each(titles, function(title) {
 				var liEl = $('<li>').addClass('tiddler-title').text(title);
