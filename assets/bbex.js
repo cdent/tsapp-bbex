@@ -12,7 +12,9 @@
 		Tiddler,
 		Tiddlers,
 		TiddlerView,
-		TiddlerListView;
+		TiddlerListView,
+		templateSource = $("#tiddler-template").text(),
+		tiddlerTemplate = Handlebars.compile(templateSource);
 
 	/*
 	 * A single tiddler. With idAttribute set, Backbone knows
@@ -59,22 +61,20 @@
 		 * with `toList`.
 		 */
 		events: {
-			'click .tiddler-body': 'toList'
+			'click .tiddler-container': 'toList'
 		},
 
 		/*
 		 * Remove the current tiddler view from the dom.
 		 */
 		toList: function(args) {
-			$(args.currentTarget).remove();
+			this.$el.html(this.model.get('title'));
 		},
 
 		/*
 		 * Render this tiddler's text. Use render
 		 * if present, otherwise fiddle to display text
 		 * as a nice pre, or an image if it is one.
-		 *
-		 * Probably should use a template.
 		 */
 		render: function() {
 			var tiddler = this.model,
@@ -93,7 +93,11 @@
 			} else {
 				text = '<pre>' + text + '</pre>';
 			}
-			nest = $('<div>').html(text).attr('class', 'tiddler-body');
+			nest = tiddlerTemplate({
+				text: text,
+				modifier: tiddler.get('modifier'),
+				modified: tiddler.get('modified')
+			});
 			this.$el.append(nest);
 			return this;
 		}

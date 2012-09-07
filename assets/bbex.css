@@ -1,14 +1,36 @@
 
+pre {
+	white-space: pre;
+	word-wrap: normal;
+}
+
 .tiddler-title,
-.tiddler-body {
+.tiddler-container {
 	cursor: pointer; 
 }
 
-body,
-.tiddler-body {
+body {
 	padding: 1em;
 	margin: 1em;
 	border: thin solid black;
+}
+
+.tiddler-container {
+	width: 75%;
+	border: thin solid black;
+	margin: .25em .25em .25em -1em;
+	padding: .25em 1em 1em 1em;
+}
+
+.tiddler-body {
+	clear: both;
+	overflow-x: scroll;
+}
+
+.meta {
+	font-size: 75%;
+	float: right;
+	padding-left: 1em;
 }
 
 .info {
