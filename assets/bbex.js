@@ -34,7 +34,7 @@
 		 * to force the underlying ajax calls to behave.
 		 */
 		url: function() {
-			return this.get('uri') + ".json?render=1";
+			return this.get('uri');
 		}
 
 	});
@@ -67,7 +67,7 @@
 		/*
 		 * Remove the current tiddler view from the dom.
 		 */
-		toList: function(args) {
+		toList: function() {
 			this.$el.html(this.model.get('title'));
 		},
 
@@ -112,8 +112,9 @@
 		 * If the collection is reset, refresh the view.
 		 */
 		initialize: function() {
-			_.bindAll(this, 'render');
+			_.bindAll(this, 'render', 'renderOne');
 			this.collection.bind('reset', this.render);
+			this.collection.bind('add', this.renderOne);
 		},
 
 		/*
@@ -135,7 +136,7 @@
 				$(target).addClass('visited');
 				var view = new TiddlerView({model: model, el: target});
 				if (!model.has('text')) {
-					model.fetch();
+					model.fetch({url: model.url() + '.json?render=1'});
 				} else {
 					view.render();
 				}
@@ -144,16 +145,21 @@
 		},
 
 		/*
+		 * Add one title to list.
+		 */
+		renderOne: function(model) {
+			var liEl = $('<li>').addClass('tiddler-title').text(
+				model.get('title')
+			);
+			this.$el.prepend(liEl);
+		},
+
+		/*
 		 * List all the tiddler titles.
 		 */
 		render: function() {
-			var that = this,
-				titles = this.collection.pluck('title');
-			that.$el.empty();
-			_.each(titles, function(title) {
-				var liEl = $('<li>').addClass('tiddler-title').text(title);
-				that.$el.append(liEl);
-			});
+			this.$el.empty();
+			this.collection.each(this.renderOne);
 			return this;
 		}
 	});
@@ -182,6 +188,9 @@
 		var sorter = function(modelA, modelB) {
 			var valueA = modelA.get(field),
 				valueB = modelB.get(field);
+			if (!valueA || !valueB) {
+				return 0;
+			}
 			if (isNaN(valueA)) {
 				valueA = valueA.toLowerCase();
 				valueB = valueB.toLowerCase();
@@ -201,7 +210,8 @@
 		if (options.reverse) {
 			sorter = compose(reverse, sorter);
 		}
-		return sorter;
+		// reverse because we render by prepend not append
+		return compose(reverse, sorter);
 	}
 
 	/*
